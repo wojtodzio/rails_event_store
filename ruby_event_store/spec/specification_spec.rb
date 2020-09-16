@@ -661,7 +661,7 @@ module RubyEventStore
 
     def test_record(event_id = SecureRandom.uuid, event_type: TestEvent, data: {})
       mapper.event_to_record(
-        TimestampEnrichment.with_timestamp(
+        TimeEnrichment.with(
           event_type.new(
             event_id: event_id,
             data: data,

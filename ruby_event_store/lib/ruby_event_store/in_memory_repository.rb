@@ -69,7 +69,8 @@ module RubyEventStore
             event_type: record.event_type,
             data:       record.data,
             metadata:   record.metadata,
-            timestamp: Time.iso8601(global.fetch(location).timestamp),
+            timestamp:  Time.iso8601(global.fetch(location).timestamp),
+            valid_at:   record.valid_at,
           ).serialize(serializer)
         global[location] = serialized_record
         streams.values.each do |str|
