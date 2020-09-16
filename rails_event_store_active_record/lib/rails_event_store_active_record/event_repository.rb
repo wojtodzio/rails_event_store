@@ -60,7 +60,7 @@ module RailsEventStoreActiveRecord
       start_transaction do
         existing = @event_klass.where(id: for_update).pluck(:id)
         (for_update - existing).each{|id| raise RubyEventStore::EventNotFound.new(id) }
-        @event_klass.import(hashes, on_duplicate_key_update: [:data, :metadata, :event_type])
+        @event_klass.import(hashes, on_duplicate_key_update: [:data, :metadata, :event_type, :valid_at])
       end
     end
 
@@ -127,6 +127,7 @@ module RailsEventStoreActiveRecord
         metadata:   serialized_record.metadata,
         event_type: serialized_record.event_type,
         created_at: serialized_record.timestamp,
+        valid_at:   serialized_record.valid_at,
       }
     end
 

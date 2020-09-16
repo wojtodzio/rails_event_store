@@ -96,6 +96,7 @@ module RailsEventStoreActiveRecord
         data: record.event.data,
         event_type: record.event.event_type,
         timestamp: record.event.created_at.iso8601(RubyEventStore::TIMESTAMP_PRECISION),
+        valid_at: record.event.valid_at.iso8601(RubyEventStore::TIMESTAMP_PRECISION),
       ).deserialize(serializer)
     end
   end
