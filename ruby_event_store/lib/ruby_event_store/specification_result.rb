@@ -5,14 +5,15 @@ module RubyEventStore
     def initialize(direction: :forward,
                    start: nil,
                    stop: nil,
+                   time_sort_by: nil,
                    count: nil,
                    stream: Stream.new(GLOBAL_STREAM),
                    read_as: :all,
                    batch_size: Specification::DEFAULT_BATCH_SIZE,
                    with_ids: nil,
                    with_types: nil)
-      @attributes = Struct.new(:direction, :start, :stop, :count, :stream, :read_as, :batch_size, :with_ids, :with_types)
-        .new(direction, start, stop, count, stream, read_as, batch_size, with_ids, with_types)
+      @attributes = Struct.new(:direction, :start, :stop, :time_sort_by, :count, :stream, :read_as, :batch_size, :with_ids, :with_types)
+        .new(direction, start, stop, time_sort_by, count, stream, read_as, batch_size, with_ids, with_types)
       freeze
     end
 
@@ -54,6 +55,14 @@ module RubyEventStore
     # @return [String|Symbol]
     def stop
       attributes.stop
+    end
+
+    # Time sorting strategy. Nil when not specified.
+    # {http://railseventstore.org/docs/read/ Find out more}.
+    #
+    # @return [Symbol]
+    def time_sort_by
+      attributes.time_sort_by
     end
 
     # Read direction. True is reading forward
@@ -179,6 +188,7 @@ module RubyEventStore
     # * direction
     # * start
     # * stop
+    # * time_sort_by
     # * count
     # * stream
     # * read_as
@@ -193,6 +203,7 @@ module RubyEventStore
         get_direction,
         start,
         stop,
+        time_sort_by,
         limit,
         stream,
         attributes.read_as,
