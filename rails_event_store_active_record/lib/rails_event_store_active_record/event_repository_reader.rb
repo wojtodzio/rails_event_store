@@ -53,12 +53,23 @@ module RailsEventStoreActiveRecord
       stream = @stream_klass.preload(:event).where(stream: normalize_stream_name(spec))
       stream = stream.where(event_id: spec.with_ids) if spec.with_ids?
       stream = stream.joins(:event).where(event_store_events: {event_type: spec.with_types}) if spec.with_types?
-      stream = stream.order(position: order(spec)) unless spec.stream.global?
+      stream = ordered(stream, spec)
       stream = stream.limit(spec.limit) if spec.limit?
       stream = stream.where(start_condition(spec)) if spec.start
       stream = stream.where(stop_condition(spec)) if spec.stop
       stream = stream.order(id: order(spec))
       stream
+    end
+
+    def ordered(stream, spec)
+      case spec.time_sort_by
+      when :as_at
+        stream.joins(:event).order("event_store_events.created_at #{order(spec)}")
+      when :as_of
+        stream.joins(:event).order("event_store_events.valid_at #{order(spec)}")
+      else
+        spec.stream.global? ? stream : stream.order(position: order(spec))
+      end
     end
 
     def normalize_stream_name(specification)

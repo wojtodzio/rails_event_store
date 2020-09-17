@@ -1286,5 +1286,19 @@ module RubyEventStore
 
       expect(event.timestamp).to eq(time)
     end
+
+    specify "time order is respected" do
+      repository.append_to_stream([
+          SRecord.new(event_id: e1 = SecureRandom.uuid, timestamp: Time.new(2020,1,1), valid_at: Time.new(2020,1,9)),
+          SRecord.new(event_id: e2 = SecureRandom.uuid, timestamp: Time.new(2020,1,3), valid_at: Time.new(2020,1,6)),
+          SRecord.new(event_id: e3 = SecureRandom.uuid, timestamp: Time.new(2020,1,2), valid_at: Time.new(2020,1,3)),
+        ],
+        Stream.new("Dummy"),
+        ExpectedVersion.any
+      )
+      expect(repository.read(specification.result).map(&:event_id)).to eq [e1, e2, e3]
+      expect(repository.read(specification.as_at.result).map(&:event_id)).to eq [e1, e3, e2]
+      expect(repository.read(specification.as_of.result).map(&:event_id)).to eq [e3, e2, e1]
+    end
   end
 end
